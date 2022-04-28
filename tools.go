@@ -1,0 +1,1 @@
+package go_aut_registration_user_telegram
