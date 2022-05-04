@@ -2,7 +2,8 @@ package tbot
 
 import (
 	"context"
-	"log"
+	"crypto/rand"
+	"strings"
 
 	"main.go/internal/database"
 
@@ -10,10 +11,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var myKeyboard = tgbotapi.NewReplyKeyboard(
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("отправить код повторно"),
-	),
+var (
+	phoneNumberKeyboard = tgbotapi.NewOneTimeReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.KeyboardButton{Text: "отправить ваш личный номер телефона", RequestContact: true},
+		),
+	)
 )
 
 func NewStage(db database.Storage, bot *tgbotapi.BotAPI) *stage {
@@ -35,36 +38,91 @@ func (s *stage) IsInProcess(chat int64) bool {
 	return ok
 }
 
-func (s *stage) StageStart(ctx context.Context, logger *logrus.Logger, chat int64) {
+func (s *stage) StageStart(ctx context.Context, logger *logrus.Logger, c chan string, chat int64) {
+	s.statusStageMap[chat] = true
+	defer delete(s.statusStageMap, chat)
 
-	//Определяем существует ли пользователь, если нет, то добавляем его в таблицу   //TODO: future logic connecting with DB
-	//flag, err := s.db.IsExist(ctx, logger, chat)
-	//if err != nil {
-	//	logger.Warning("problems with DB, when trying to check user: %s", err)
-	//	return
-	//}
-	//if !flag {
-	//	if err := s.db.AddUser(ctx, logger, chat); err != nil {
-	//		logger.Warning("user was not added: %s", err)
-	//		return
-	//	}
-	//}
+	text := []string{"Добрый день, спасибо что присоединились к телеграм боту RPG-bank, для вашей ",
+		"верификации нам необходимо подтвердить ваш номер телефона. Если вы согласны с обработкой ваших персональных данных - нажмите ",
+		"на кнопку ниже, если нет, то можете ничего не делать."}
 
-	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, "Добрый день, вам отправлен код активации для регистрации на сайте RPG-BANK")); err != nil {
-		logger.Warning("message 'Добрый день....' was not send: %s", err)
-	}
-}
-
-func (s *stage) StageUnknownCommand(chat int64) {
-	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, "Команда не распознана, выберите из списка /info")); err != nil {
-		log.Printf("message 'Команда не распознана....' was not send: %s", err)
-	}
-}
-
-func (s *stage) StageInfo(chat int64, message string) {
-	msg := tgbotapi.NewMessage(chat, message)
-	msg.ReplyMarkup = myKeyboard
+	msg := tgbotapi.NewMessage(chat, strings.Join(text, ""))
+	msg.ReplyMarkup = phoneNumberKeyboard
 	if _, err := s.bot.Send(msg); err != nil {
-		log.Printf("some problems with main keyboard: %s", err)
+		logger.Printf("some problems with phone keyboard: %s", err)
 	}
+
+	phoneNumber := <-c
+	if phoneNumber[0] != '+' {
+		phoneNumber = "+" + phoneNumber
+	}
+	logger.Printf("we get phone number: " + phoneNumber)
+
+	// Определяем существует ли пользователь, если нет, то добавляем его в таблицу
+	flag, err := s.db.IsExist(ctx, logger, phoneNumber)
+	if err != nil {
+		msg = tgbotapi.NewMessage(chat, "Этот номер телефона не принадлежит клиенту банка")
+		if _, err := s.bot.Send(msg); err != nil {
+			logger.Printf("some problems with sending message: %s", err)
+		}
+		logger.Warning("problems with DB, when trying to check user: %s", err)
+		return
+	}
+	if flag {
+		msg = tgbotapi.NewMessage(chat, "Пользователь с этим номером телефона уже зарегистрирован")
+		if _, err := s.bot.Send(msg); err != nil {
+			logger.Printf("some problems with sending message: %s", err)
+		}
+		return
+	}
+	if !flag {
+		if err := s.db.AddUser(ctx, logger, chat, phoneNumber); err != nil {
+			logger.Warning("user was not added: %s", err)
+			return
+		}
+		msg = tgbotapi.NewMessage(chat, "Спасибо за оказанное доверие. Теперь при помощи Телеграм у вас будет возможность управлять вашими личными данными RPG-bank.")
+		if _, err := s.bot.Send(msg); err != nil {
+			logger.Printf("some problems with sending message: %s", err)
+		}
+	}
+}
+
+func (s *stage) StageUnknownCommand(logger *logrus.Logger, chat int64) {
+	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, "Данный бот не способен отвечать на подобные запросы")); err != nil {
+		logger.Printf("message 'Данный бот не способен....' was not send: %s", err)
+	}
+}
+
+func (s *stage) StageInfo(logger *logrus.Logger, chat int64) {
+	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, "В случае необходимости телеграмм бот отправит вам сообщение, касающееся RPG-BANK")); err != nil {
+		logger.Printf("message 'В случае необходимости....' was not send: %s", err)
+	}
+}
+
+func (s *stage) StageError(logger *logrus.Logger, chat int64, err error) {
+	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, err.Error())); err != nil {
+		logger.Printf("message was not send: %s", err)
+	}
+}
+
+//Get information by grpc with phone number, find chatID in database and send code to telegram
+//and the same code back using grpc
+
+func (s *stage) SendCode(ctx context.Context, logger *logrus.Logger, phone string) error {
+	chat, err := s.db.FindUserChatId(ctx, logger, phone)
+	if err != nil {
+		logger.Printf("imposibble to send message to this user: %s", err)
+	}
+
+	RandomCode, _ := rand.Prime(rand.Reader, 18)
+	code := RandomCode.String()
+
+	//TODO: добавить отправку секретного кода вместе с номером телефона по grpc
+
+	msg := tgbotapi.NewMessage(chat, code)
+	if _, err := s.bot.Send(msg); err != nil {
+		logger.Printf("some problems with sending message: %s", err)
+		return err
+	}
+	return nil
 }

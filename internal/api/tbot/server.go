@@ -2,9 +2,12 @@ package tbot
 
 import (
 	"context"
+	"strings"
+
 	"main.go/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,17 +62,32 @@ func (s *telegramServer) RunBot(ctx context.Context) {
 		}
 
 		if c, ok := AdditionalChat[update.Message.Chat.ID]; ok {
-			c <- update.Message.Text
+			switch {
+			case update.Message.Contact == nil:
+				text := []string{"Пришлите свой контакт - нажав на кнопку, ",
+					"либо выбрав свой номер из списка контактов"}
+				s.stageHandler.StageError(s.logger, update.Message.Chat.ID, errors.New(strings.Join(text, "")))
+			case update.Message.Contact.PhoneNumber != "" && update.Message.From.ID == update.Message.Contact.UserID:
+				c <- update.Message.Contact.PhoneNumber
+			default:
+				text := []string{"Вы не можете исспользовать номер телефона, ",
+					"на который не зарегестрирован ваш телеграм пользователь."}
+				s.stageHandler.StageError(s.logger, update.Message.Chat.ID, errors.New(strings.Join(text, "")))
+			}
 			continue
 		}
 
 		switch update.Message.Text {
 		case getCommandStart:
-			s.stageHandler.StageStart(ctx, s.logger, update.Message.Chat.ID)
+			if _, ok := AdditionalChat[update.Message.Chat.ID]; !ok {
+				c := make(chan string)
+				AdditionalChat[update.Message.Chat.ID] = c
+				go s.stageHandler.StageStart(ctx, s.logger, c, update.Message.Chat.ID)
+			}
 		case getCommandInfo:
-			s.stageHandler.StageInfo(update.Message.Chat.ID, update.Message.Text)
+			s.stageHandler.StageInfo(s.logger, update.Message.Chat.ID)
 		default:
-			s.stageHandler.StageUnknownCommand(update.Message.Chat.ID)
+			s.stageHandler.StageUnknownCommand(s.logger, update.Message.Chat.ID)
 		}
 	}
 }
