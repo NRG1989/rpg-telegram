@@ -3,17 +3,16 @@ package main
 import (
 	"context"
 	"flag"
-
 	"main.go/internal/api/tbot"
 	"main.go/internal/config"
 	"main.go/internal/database/postgress"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	var (
-		logger         *log.Logger
+		logger         *logrus.Logger
 		cfg            *config.Config
 		err            error
 		configFilePath = flag.String("config", "./config.json", "path to configuration file")
@@ -21,8 +20,8 @@ func main() {
 
 	ctx := context.Background()
 
-	logger = log.New()
-	logger.SetLevel(log.DebugLevel)
+	logger = logrus.New()
+	logger.SetLevel(logrus.DebugLevel)
 
 	cfg, err = config.LoadConfig(*configFilePath)
 	if err != nil {
@@ -34,9 +33,11 @@ func main() {
 		logger.WithError(err).Fatal("constructing database error")
 	}
 
-	log.Info("successfully connected to DB!!")
+	storage := postgress.NewStorage(db)
 
-	telegramServer, err := tbot.NewTelegramServer(cfg.API.BotToken, logger, db)
+	logger.Info("successfully connected to DB!!")
+
+	telegramServer, err := tbot.NewTelegramServer(cfg.API.BotToken, logger, storage)
 	if err != nil {
 		logger.WithError(err).Fatal("constructing bot error")
 	}
