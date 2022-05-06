@@ -2,10 +2,9 @@ package tbot
 
 import (
 	"context"
-	"crypto/rand"
 	"strings"
 
-	"main.go/internal/database"
+	"tgbotapi/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sirupsen/logrus"
@@ -103,26 +102,4 @@ func (s *stage) StageError(logger *logrus.Logger, chat int64, err error) {
 	if _, err := s.bot.Send(tgbotapi.NewMessage(chat, err.Error())); err != nil {
 		logger.Printf("message was not send: %s", err)
 	}
-}
-
-//Get information by grpc with phone number, find chatID in database and send code to telegram
-//and the same code back using grpc
-
-func (s *stage) SendCode(ctx context.Context, logger *logrus.Logger, phone string) error {
-	chat, err := s.db.FindUserChatId(ctx, logger, phone)
-	if err != nil {
-		logger.Printf("imposibble to send message to this user: %s", err)
-	}
-
-	RandomCode, _ := rand.Prime(rand.Reader, 18)
-	code := RandomCode.String()
-
-	//TODO: добавить отправку секретного кода вместе с номером телефона по grpc
-
-	msg := tgbotapi.NewMessage(chat, code)
-	if _, err := s.bot.Send(msg); err != nil {
-		logger.Printf("some problems with sending message: %s", err)
-		return err
-	}
-	return nil
 }

@@ -3,7 +3,7 @@ package postgress
 import (
 	"context"
 
-	"main.go/internal/config"
+	"tgbotapi/internal/config"
 
 	"github.com/jackc/pgx"
 	_ "github.com/jackc/pgx/stdlib"

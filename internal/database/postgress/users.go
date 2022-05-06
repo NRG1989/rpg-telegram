@@ -75,7 +75,7 @@ func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, ph
 	}
 
 	var chatId int64
-	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(chatId); err != nil {
+	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&chatId); err != nil {
 		logger.Error(err)
 		return 0, err
 	}

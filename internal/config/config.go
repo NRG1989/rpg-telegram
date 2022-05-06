@@ -25,6 +25,7 @@ type LogConfig struct {
 
 type API struct {
 	Address         string        `json:"address"`
+	GRPCAddress     string        `json:"grpc_address"`
 	ReadTimeout     time.Duration `json:"read_timeout"`
 	WriteTimeout    time.Duration `json:"write_timeout"`
 	ShutdownTimeout time.Duration `json:"shutdown_timeout"`
@@ -58,6 +59,7 @@ func defaultConfig() (cfg *Config) {
 		},
 		API: API{
 			Address:         ":5001",
+			GRPCAddress:     ":5011",
 			ReadTimeout:     30 * time.Second,
 			WriteTimeout:    30 * time.Second,
 			ShutdownTimeout: 5 * time.Second,
