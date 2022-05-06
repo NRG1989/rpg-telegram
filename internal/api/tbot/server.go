@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"main.go/internal/database"
+	"tgbotapi/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"
@@ -17,7 +17,7 @@ const (
 )
 
 type telegramServer struct {
-	bot          *tgbotapi.BotAPI
+	*tgbotapi.BotAPI
 	logger       *logrus.Logger
 	stageHandler Stager
 }
@@ -45,7 +45,7 @@ func (s *telegramServer) RunBot(ctx context.Context) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates := s.bot.GetUpdatesChan(u)
+	updates := s.GetUpdatesChan(u)
 
 	for update := range updates {
 		if update.Message == nil { // ignore non-Message updates

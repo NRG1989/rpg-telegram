@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"flag"
-	"main.go/internal/api/tbot"
-	"main.go/internal/config"
-	"main.go/internal/database/postgress"
+
+	"tgbotapi/internal/api/grpc"
+	"tgbotapi/internal/api/tbot"
+	"tgbotapi/internal/config"
+	"tgbotapi/internal/database/postgress"
 
 	"github.com/sirupsen/logrus"
 )
@@ -41,5 +43,13 @@ func main() {
 	if err != nil {
 		logger.WithError(err).Fatal("constructing bot error")
 	}
+
+	go func() {
+		logger.Info("starting gRPC server")
+		if err := grpc.NewGRPCService(logger, cfg.API.GRPCAddress, storage, telegramServer).Run(); err != nil {
+			logger.WithError(err).Fatal("connection to grpc error")
+		}
+	}()
+
 	telegramServer.RunBot(ctx)
 }
