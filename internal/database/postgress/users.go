@@ -36,7 +36,7 @@ func (db database) AddUser(ctx context.Context, logger *logrus.Logger, chat int6
 	return nil
 }
 
-func (db database) IsExist(ctx context.Context, logger *logrus.Logger, phone string) (bool, error) {
+func (db database) IsUserExist(ctx context.Context, logger *logrus.Logger, phone string) (bool, error) {
 	qb := sq.
 		Select(
 			"chat_id",
@@ -80,4 +80,45 @@ func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, ph
 		return 0, err
 	}
 	return chatId, nil
+}
+
+func (db database) IsPhoneExist(ctx context.Context, logger *logrus.Logger, phone string) (bool, error) {
+	qb := sq.
+		Select(
+			"phone_number",
+		).
+		From("userservice.client_telegram").
+		Where(sq.Eq{"phone_number": phone})
+
+	query, args, err := qb.PlaceholderFormat(sq.Dollar).ToSql()
+	if err != nil {
+		logger.Error(err)
+		return false, err
+	}
+	var scanedPhone string
+	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&scanedPhone); err != nil {
+		logger.Error(err)
+		return false, err
+	}
+	return true, nil
+}
+
+func (db database) AddPhone(ctx context.Context, logger *logrus.Logger, phone string) error {
+
+	query, args, err := sq.Insert("userservice.client_telegram").
+		SetMap(map[string]interface{}{
+			"phone_number": phone,
+		}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	if _, err = db.client.ExecContext(ctx, query, args...); err != nil {
+		logger.Error(err)
+		return err
+	}
+	return nil
 }

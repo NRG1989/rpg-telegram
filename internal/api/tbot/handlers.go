@@ -57,8 +57,8 @@ func (s *stage) StageStart(ctx context.Context, logger *logrus.Logger, c chan st
 	}
 	logger.Printf("we get phone number: " + phoneNumber)
 
-	// Определяем существует ли пользователь, если нет, то добавляем его в таблицу
-	flag, err := s.db.IsExist(ctx, logger, phoneNumber)
+	// Определяем существует ли номер чата пользователья если нет, то добавляем его в таблицу
+	flag, err := s.db.IsUserExist(ctx, logger, phoneNumber)
 	if err != nil {
 		msg = tgbotapi.NewMessage(chat, "Этот номер телефона не принадлежит клиенту банка")
 		if _, err := s.bot.Send(msg); err != nil {

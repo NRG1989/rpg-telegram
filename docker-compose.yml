@@ -1,31 +1,6 @@
 version: '3.7'
 
 services:
-  db:
-    image: postgres:13-alpine
-    container_name: postgres
-    labels:
-      - "keep"
-    environment:
-      POSTGRES_USER: rpguser
-      POSTGRES_DB: rpgDB
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - 5454:5432
-    restart: always
-
-  pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-    restart: always
-
   rpg-api-telegram:
     build: ./
     command: ./rpg-api-telegram
