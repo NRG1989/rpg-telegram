@@ -8,6 +8,5 @@ services:
     container_name: rpg-api-telegram
     ports:
       - 5001:5001
-    depends_on:
-      - db
+      - 5432:5432
     restart: always
