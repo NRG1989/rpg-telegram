@@ -3,10 +3,9 @@ module tgbotapi
 go 1.18
 
 require (
-	git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.0.7
+	git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.0.8
 	github.com/Masterminds/squirrel v1.5.2
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.0
-	github.com/golang/mock v1.6.0
 	github.com/hedhyw/jsoncjson v1.1.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jmoiron/sqlx v1.3.5

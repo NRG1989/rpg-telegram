@@ -26,7 +26,7 @@ type handler struct {
 }
 
 func (h *handler) SendCode(ctx context.Context, request *pbTg.SendCodeRequest) (*pbTg.SendCodeResponse, error) {
-	chat, err := h.DB.FindUserChatId(ctx, h.Logger, request.Phone)
+	chat, clientID, err := h.DB.FindUserChatId(ctx, h.Logger, request.Phone)
 	if err != nil {
 		h.Logger.Printf("imposibble to send message to this user: %s", err)
 		return nil, err
@@ -41,8 +41,8 @@ func (h *handler) SendCode(ctx context.Context, request *pbTg.SendCodeRequest) (
 		return nil, err
 	}
 	return &pbTg.SendCodeResponse{
-		Phone: request.Phone,
-		Code:  code,
+		Id:   clientID,
+		Code: code,
 	}, nil
 }
 
@@ -50,13 +50,13 @@ func (h *handler) SendPhoneNumber(ctx context.Context, request *pbBas.SendPhoneN
 	flag, err := h.DB.IsPhoneExist(ctx, h.Logger, request.Phone)
 
 	if err == sql.ErrNoRows && !flag {
-		if err := h.DB.AddPhone(ctx, h.Logger, request.Phone); err != nil {
+		if err := h.DB.AddPhone(ctx, h.Logger, request.Phone, request.Id); err != nil {
 			h.Logger.Printf("phone was not add: %s", err)
-			return &pbBas.SendPhoneNumberResponse{}, err
+			return &pbBas.SendPhoneNumberResponse{Result: false}, err
 		}
 		h.Logger.Info("phone added to DB")
-		return &pbBas.SendPhoneNumberResponse{}, nil
+		return &pbBas.SendPhoneNumberResponse{Result: true}, nil
 	}
 	h.Logger.Info("phone was already present at DB")
-	return &pbBas.SendPhoneNumberResponse{}, err
+	return &pbBas.SendPhoneNumberResponse{Result: false}, err
 }

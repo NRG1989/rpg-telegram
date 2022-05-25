@@ -60,9 +60,10 @@ func (db database) IsUserExist(ctx context.Context, logger *logrus.Logger, phone
 	return true, nil
 }
 
-func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, phone string) (int64, error) {
+func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, phone string) (int64, string, error) {
 	qb := sq.
 		Select(
+			"id",
 			"chat_id",
 		).
 		From("userservice.client_telegram").
@@ -71,15 +72,19 @@ func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, ph
 	query, args, err := qb.PlaceholderFormat(sq.Dollar).ToSql()
 	if err != nil {
 		logger.Error(err)
-		return 0, err
+		return 0, "", err
 	}
 
-	var chatId int64
-	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&chatId); err != nil {
+	var (
+		chatId   int64
+		clientID string
+	)
+
+	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&chatId, &clientID); err != nil {
 		logger.Error(err)
-		return 0, err
+		return 0, "", err
 	}
-	return chatId, nil
+	return chatId, clientID, nil
 }
 
 func (db database) IsPhoneExist(ctx context.Context, logger *logrus.Logger, phone string) (bool, error) {
@@ -103,10 +108,11 @@ func (db database) IsPhoneExist(ctx context.Context, logger *logrus.Logger, phon
 	return true, nil
 }
 
-func (db database) AddPhone(ctx context.Context, logger *logrus.Logger, phone string) error {
+func (db database) AddPhone(ctx context.Context, logger *logrus.Logger, phone string, id string) error {
 
 	query, args, err := sq.Insert("userservice.client_telegram").
 		SetMap(map[string]interface{}{
+			"id":           id,
 			"phone_number": phone,
 		}).
 		PlaceholderFormat(sq.Dollar).
