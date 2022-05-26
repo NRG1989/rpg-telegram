@@ -60,7 +60,7 @@ func (db database) IsUserExist(ctx context.Context, logger *logrus.Logger, phone
 	return true, nil
 }
 
-func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, phone string) (int64, string, error) {
+func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, phone string) (string, int64, error) {
 	qb := sq.
 		Select(
 			"id",
@@ -72,7 +72,7 @@ func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, ph
 	query, args, err := qb.PlaceholderFormat(sq.Dollar).ToSql()
 	if err != nil {
 		logger.Error(err)
-		return 0, "", err
+		return "", 0, err
 	}
 
 	var (
@@ -80,11 +80,11 @@ func (db database) FindUserChatId(ctx context.Context, logger *logrus.Logger, ph
 		clientID string
 	)
 
-	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&chatId, &clientID); err != nil {
+	if err = db.client.QueryRowxContext(ctx, query, args...).Scan(&clientID, &chatId); err != nil {
 		logger.Error(err)
-		return 0, "", err
+		return "", 0, err
 	}
-	return chatId, clientID, nil
+	return clientID, chatId, nil
 }
 
 func (db database) IsPhoneExist(ctx context.Context, logger *logrus.Logger, phone string) (bool, error) {

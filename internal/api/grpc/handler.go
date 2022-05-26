@@ -26,7 +26,7 @@ type handler struct {
 }
 
 func (h *handler) SendCode(ctx context.Context, request *pbTg.SendCodeRequest) (*pbTg.SendCodeResponse, error) {
-	chat, clientID, err := h.DB.FindUserChatId(ctx, h.Logger, request.Phone)
+	clientID, chat, err := h.DB.FindUserChatId(ctx, h.Logger, request.Phone)
 	if err != nil {
 		h.Logger.Printf("imposibble to send message to this user: %s", err)
 		return nil, err
