@@ -52,13 +52,13 @@ deploy:
     COMPOSE_PROJECT_NAME: $PROGECT
   before_script:
     - echo "$AND_DOCKER_REGISTRY_RO_PASS" | docker login -u nexus-ro "$AND_DOCKER_REGISTRY" --password-stdin
-
+    - export COMPOSE_IGNORE_ORPHANS=True
   script:
     - docker stop $APP-dev || true
     - docker rm $APP-dev || true
     - docker rmi -f $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev || true
     - docker image prune -f || true
     - docker-compose -f docker-compose.yml pull
-    - SET COMPOSE_IGNORE_ORPHANS=True && docker-compose -f docker-compose.yml up --force-recreate -d
+    - docker-compose -f docker-compose.yml up --force-recreate -d
   only:
     - devops
