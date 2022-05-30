@@ -59,6 +59,6 @@ deploy:
     - docker rmi -f $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev || true
     - docker image prune -f || true
     - docker-compose -f docker-compose.yml pull
-    - docker-compose -f docker-compose.yml up --force-recreate -d
+    - SET COMPOSE_IGNORE_ORPHANS=True && docker-compose -f docker-compose.yml up --force-recreate -d
   only:
     - devops
