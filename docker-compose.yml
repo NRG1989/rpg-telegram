@@ -3,9 +3,9 @@ version: '3.7'
 services:
   rpg-api-telegram:
     image: $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev
-    command: ./rpg-api-telegram
+    command: ./go-aut-registration-user-telegram
     tty: true
-    container_name: rpg-api-telegram
+    container_name: $APP-dev
     ports:
       - 5001:5001
       - 5432:5432

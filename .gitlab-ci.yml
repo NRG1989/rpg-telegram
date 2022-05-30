@@ -52,7 +52,6 @@ deploy:
     COMPOSE_PROJECT_NAME: $PROGECT
   before_script:
     - echo "$AND_DOCKER_REGISTRY_RO_PASS" | docker login -u nexus-ro "$AND_DOCKER_REGISTRY" --password-stdin
-    - export COMPOSE_IGNORE_ORPHANS=True
   script:
     - docker stop $APP-dev || true
     - docker rm $APP-dev || true

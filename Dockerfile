@@ -19,4 +19,4 @@ RUN echo "machine git.andersenlab.com login ${GITLAB_USER} password ${GITLAB_TOK
 RUN go mod download
 RUN go build -o go-aut-registration-user-telegram ./cmd/tgbotapi/main.go
 
-CMD ["./rpg-api-telegram"]
+CMD ["./go-aut-registration-user-telegram"]
