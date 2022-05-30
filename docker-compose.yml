@@ -3,7 +3,7 @@ version: '3.7'
 services:
   rpg-api-telegram:
     image: $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev
-    command: ./rpg-api-telegram
+
     tty: true
     container_name: rpg-api-telegram
     ports:
