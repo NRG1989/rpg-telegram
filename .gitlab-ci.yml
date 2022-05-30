@@ -1,0 +1,64 @@
+stages:
+  - sonar
+  - build
+  - deploy
+
+variables:
+  PROGECT: rpg-new
+  APP: go-aut-registration-user-telegram
+  COMPONENT_NAME: $APP
+  DOCKER_BUILDKIT: 1
+  TRANSFER_METER_FREQUENCY: "2s"
+  GIT_DEPTH: 0
+
+
+sonar:
+  stage: sonar
+  image: sonarsource/sonar-scanner-cli:latest
+  tags: [docker-dev]
+  variables:
+    SONAR_PROJECT_BASE_DIR: "$CI_PROJECT_DIR"
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}-sonar"
+    paths:
+      - .sonar/cache
+  script:
+    - /usr/bin/entrypoint.sh sonar-scanner -Dproject.settings=sonar-project.properties 
+      -Dsonar.projectKey=$PROGECT-$APP-dev 
+      -Dsonar.projectName=$PROGECT-$APP-dev 
+      -Dsonar.links.ci=$CI_PIPELINE_URL
+  allow_failure: true
+  only:
+    - devops
+    - merge_requests
+
+build:
+  stage: build
+  tags: [shell-test]
+  before_script:
+    - echo "$AND_DOCKER_REGISTRY_RW_PASS" | docker login -u nexus "$AND_DOCKER_REGISTRY" --password-stdin
+
+  script:
+    - docker build  --tag $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev -f Dockerfile --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg GITLAB_USER=$AND_USER --build-arg GITLAB_TOKEN=$AND_PASS .
+    - docker push $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev
+  only:
+    - devops
+
+deploy:
+  stage: deploy
+  tags: [shell-test]
+  variables:
+    COMPOSE_PROJECT_NAME: $PROGECT
+  before_script:
+    - echo "$AND_DOCKER_REGISTRY_RO_PASS" | docker login -u nexus-ro "$AND_DOCKER_REGISTRY" --password-stdin
+
+  script:
+    - docker stop $APP-dev || true
+    - docker rm $APP-dev || true
+    - docker rmi -f $AND_DOCKER_REGISTRY_NAME/$PROGECT-$APP:dev || true
+    - docker image prune -f || true
+    - docker-compose -f docker-compose.yml pull
+    - docker-compose -f docker-compose.yml up --force-recreate -d
+  only:
+    - devops
