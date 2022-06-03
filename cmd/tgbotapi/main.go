@@ -46,7 +46,7 @@ func main() {
 
 	go func() {
 		logger.Info("starting gRPC server")
-		if err := grpc.NewGRPCService(logger, cfg.API.GRPCAddress, storage, telegramServer).Run(); err != nil {
+		if err := grpc.NewGRPCService(logger, cfg.GrpcCfg.AddressTelegramSrv, storage, telegramServer).Run(); err != nil {
 			logger.WithError(err).Fatal("connection to grpc error")
 		}
 	}()
