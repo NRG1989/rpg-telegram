@@ -16,6 +16,7 @@ type Config struct {
 	API         API         `json:"api"`
 	DB          DB          `json:"db"`
 	TraceConfig TraceConfig `json:"trace_config"`
+	GrpcCfg     GrpcCfg     `json:"grpc_cfg"`
 }
 
 type LogConfig struct {
@@ -25,7 +26,6 @@ type LogConfig struct {
 
 type API struct {
 	Address         string        `json:"address"`
-	GRPCAddress     string        `json:"grpc_address"`
 	ReadTimeout     time.Duration `json:"read_timeout"`
 	WriteTimeout    time.Duration `json:"write_timeout"`
 	ShutdownTimeout time.Duration `json:"shutdown_timeout"`
@@ -50,6 +50,11 @@ type TraceConfig struct {
 	SamplerParam  float64 `json:"sampler_param"`
 }
 
+type GrpcCfg struct {
+	AddressUserSrv     string `json:"address"`
+	AddressTelegramSrv string `json:"address_telegram"`
+}
+
 func defaultConfig() (cfg *Config) {
 	return &Config{
 		Environment: "development",
@@ -59,7 +64,6 @@ func defaultConfig() (cfg *Config) {
 		},
 		API: API{
 			Address:         ":5001",
-			GRPCAddress:     ":5011",
 			ReadTimeout:     30 * time.Second,
 			WriteTimeout:    30 * time.Second,
 			ShutdownTimeout: 5 * time.Second,
@@ -77,6 +81,10 @@ func defaultConfig() (cfg *Config) {
 			AgentHostPort: "",
 			SamplerType:   "remote",
 			SamplerParam:  1,
+		},
+		GrpcCfg: GrpcCfg{
+			AddressUserSrv:     ":5011",
+			AddressTelegramSrv: ":5012",
 		},
 	}
 }
