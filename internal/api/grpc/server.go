@@ -3,7 +3,7 @@ package grpc
 import (
 	"net"
 
-	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/basic/.basic_server"
+	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/auth/.auth_server"
 	pbTg "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/telegram/.telegram_server"
 
 	"tgbotapi/internal/database"
@@ -41,7 +41,7 @@ func (s server) Run() error {
 
 	addr := s.GRPCAddress
 	if addr == ":5011" {
-		pbBas.RegisterGoAuthBasicServer(grpcServer, &handler{
+		pbBas.RegisterGoAuthServer(grpcServer, &handler{
 			Logger: s.logger,
 			Bot:    s.bot,
 			DB:     s.db,
