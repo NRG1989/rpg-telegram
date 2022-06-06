@@ -3,10 +3,11 @@ package grpc
 import (
 	"net"
 
-	"tgbotapi/internal/database"
-
 	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/basic/.basic_server"
 	pbTg "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/telegram/.telegram_server"
+
+	"tgbotapi/internal/database"
+
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -37,19 +38,23 @@ func (s server) Run() error {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	pbTg.RegisterGoAuthRegistrationUserTelegramServer(grpcServer, &handler{
-		Logger: s.logger,
-		Bot:    s.bot,
-		DB:     s.db,
-	})
-	pbBas.RegisterGoAuthBasicServer(grpcServer, &handler{
-		Logger: s.logger,
-		Bot:    s.bot,
-		DB:     s.db,
-	})
 
+	addr := s.GRPCAddress
+	if addr == ":5011" {
+		pbBas.RegisterGoAuthBasicServer(grpcServer, &handler{
+			Logger: s.logger,
+			Bot:    s.bot,
+			DB:     s.db,
+		})
+	} else if addr == ":5012" {
+		pbTg.RegisterGoAuthRegistrationUserTelegramServer(grpcServer, &handler{
+			Logger: s.logger,
+			Bot:    s.bot,
+			DB:     s.db,
+		})
+	}
 	if err := grpcServer.Serve(conn); err != nil {
-		s.logger.WithError(err).Errorln("connection to grpc error")
+		s.logger.WithError(err).Errorln("connection to grpc error: %#v", conn.Addr().String())
 		return err
 	}
 	return nil
