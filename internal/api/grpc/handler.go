@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 
-	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/basic/.basic_server"
+	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/auth/.auth_server"
 	pbTg "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/telegram/.telegram_server"
 	"tgbotapi/internal/database"
 
@@ -18,7 +18,7 @@ type Sender interface {
 }
 
 type handler struct {
-	pbBas.UnimplementedGoAuthBasicServer
+	pbBas.UnimplementedGoAuthServer
 	pbTg.UnimplementedGoAuthRegistrationUserTelegramServer
 	Logger *logrus.Logger
 	DB     database.Storage
