@@ -20,5 +20,6 @@ RUN go mod download
 RUN go build -o go-aut-registration-user-telegram ./cmd/tgbotapi/main.go
 
 EXPOSE 5011
+EXPOSE 5012
 
 CMD ["./go-aut-registration-user-telegram"]
