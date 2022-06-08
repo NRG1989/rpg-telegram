@@ -9,4 +9,5 @@ services:
     ports:
       - 5001:5001
       - 5432:5432
+      - 5012:5012
     restart: always
