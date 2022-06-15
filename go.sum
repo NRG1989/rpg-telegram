@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.1.1 h1:wX4NA4lBWhMa/DmVNHWRYEHa/bUlLcqjn2DYOLciHRE=
 git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.1.1/go.mod h1:iV050hNTD3sVnIaF8HkTbK+zw89ZelcySbdVjTJ0P4Q=
+git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.1.3 h1:2HcNteBqE04W+cnJPOz9PKTGPuw0wetJuD0tahOP5I8=
+git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git v0.1.3/go.mod h1:iV050hNTD3sVnIaF8HkTbK+zw89ZelcySbdVjTJ0P4Q=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Masterminds/squirrel v1.5.2 h1:UiOEi2ZX4RCSkpiNDQN5kro/XIBpSRk9iTqdIRPzUXE=
 github.com/Masterminds/squirrel v1.5.2/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA400rg+riTZj10=

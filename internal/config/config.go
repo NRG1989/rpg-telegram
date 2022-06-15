@@ -83,8 +83,7 @@ func defaultConfig() (cfg *Config) {
 			SamplerParam:  1,
 		},
 		GrpcCfg: GrpcCfg{
-			AddressUserSrv:     ":5011",
-			AddressTelegramSrv: ":5012",
+			AddressTelegramSrv: "rpg-api-telegram:5012",
 		},
 	}
 }
