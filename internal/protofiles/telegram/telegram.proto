@@ -1,0 +1,18 @@
+syntax="proto3";
+option go_package = ".telegram_server";
+package telegram_server;
+
+service GoAuthRegistrationUserTelegram {
+
+  rpc SendCode (SendCodeRequest) returns (SendCodeResponse);
+
+}
+
+message SendCodeRequest{
+  string phone = 1;
+}
+
+message SendCodeResponse{
+  string id = 1;
+  string code = 2;
+}

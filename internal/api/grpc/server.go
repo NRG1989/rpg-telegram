@@ -3,9 +3,9 @@ package grpc
 import (
 	"net"
 
-	pbTg "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/telegram/.telegram_server"
+	pbTg "go-aut-registration-user-telegram/internal/protofiles/telegram"
 
-	"tgbotapi/internal/database"
+	"go-aut-registration-user-telegram/internal/database"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

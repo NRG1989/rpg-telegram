@@ -1,0 +1,18 @@
+syntax="proto3";
+option go_package = ".auth_server";
+package auth_server;
+
+service GoAuth {
+
+  rpc SendPhoneNumber (SendPhoneNumberRequest) returns (SendPhoneNumberResponse);
+
+}
+
+message SendPhoneNumberRequest{
+  string id = 1;
+  string phone = 2;
+}
+
+message SendPhoneNumberResponse{
+  bool result = 1;
+}

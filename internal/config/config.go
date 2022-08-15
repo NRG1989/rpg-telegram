@@ -70,7 +70,7 @@ func defaultConfig() (cfg *Config) {
 			MainPath:        "/api/v1",
 		},
 		DB: DB{
-			URL:          "postgres://rpguser:rpgpass@10.10.15.90:5432/RpgDB?sslmode=disable",
+			URL:          "postgres://rpguser:rpguser@10.10.14.10:5452/rpgDB?sslmode=disable",
 			SchemaName:   "RpgDB",
 			MaxOpenConns: 2,
 			MaxIdleConns: 2,

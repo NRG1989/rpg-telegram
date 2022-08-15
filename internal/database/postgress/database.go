@@ -3,7 +3,7 @@ package postgress
 import (
 	"context"
 
-	"tgbotapi/internal/config"
+	"go-aut-registration-user-telegram/internal/config"
 
 	"github.com/jackc/pgx"
 	_ "github.com/jackc/pgx/stdlib"

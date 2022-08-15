@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"tgbotapi/internal/database"
+	"go-aut-registration-user-telegram/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"

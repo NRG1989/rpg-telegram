@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"tgbotapi/internal/database"
+	"go-aut-registration-user-telegram/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sirupsen/logrus"
@@ -41,7 +41,7 @@ func (s *stage) StageStart(ctx context.Context, logger *logrus.Logger, c chan st
 	s.statusStageMap[chat] = true
 	defer delete(s.statusStageMap, chat)
 
-	text := []string{"Добрый день, спасибо что присоединились к телеграм боту RPG-bank, для вашей ",
+	text := []string{"Добрый день, спасибо что присоединились к телеграм боту -bank, для вашей ",
 		"верификации нам необходимо подтвердить ваш номер телефона. Если вы согласны с обработкой ваших персональных данных - нажмите ",
 		"на кнопку ниже, если нет, то можете ничего не делать."}
 

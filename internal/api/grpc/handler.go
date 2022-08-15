@@ -5,10 +5,10 @@ import (
 	"crypto/rand"
 	"database/sql"
 
-	pbBas "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/auth/.auth_server"
-	pbTg "git.andersenlab.com/Andersen/rpg-new/go-aut-registration-user-grpc.git/protofiles/telegram/.telegram_server"
+	pbBas "go-aut-registration-user-telegram/internal/protofiles/auth"
+	pbTg "go-aut-registration-user-telegram/internal/protofiles/telegram"
 
-	"tgbotapi/internal/database"
+	"go-aut-registration-user-telegram/internal/database"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sirupsen/logrus"
@@ -47,17 +47,17 @@ func (h *handler) SendCode(ctx context.Context, request *pbTg.SendCodeRequest) (
 	}, nil
 }
 
-func (h *handler) SendPhoneNumber(ctx context.Context, request *pbTg.SendPhoneNumberRequest) (*pbTg.SendPhoneNumberResponse, error) {
+func (h *handler) SendPhoneNumber(ctx context.Context, request *pbBas.SendPhoneNumberRequest) (*pbBas.SendPhoneNumberResponse, error) {
 	flag, err := h.DB.IsPhoneExist(ctx, h.Logger, request.Phone)
 
 	if err == sql.ErrNoRows && !flag {
 		if err := h.DB.AddPhone(ctx, h.Logger, request.Phone, request.Id); err != nil {
 			h.Logger.Printf("phone was not add: %s", err)
-			return &pbTg.SendPhoneNumberResponse{Result: false}, err
+			return &pbBas.SendPhoneNumberResponse{Result: false}, err
 		}
 		h.Logger.Info("phone added to DB")
-		return &pbTg.SendPhoneNumberResponse{Result: true}, nil
+		return &pbBas.SendPhoneNumberResponse{Result: true}, nil
 	}
 	h.Logger.Info("phone was already present at DB")
-	return &pbTg.SendPhoneNumberResponse{Result: false}, err
+	return &pbBas.SendPhoneNumberResponse{Result: false}, err
 }

@@ -2,6 +2,7 @@ package tbot
 
 import (
 	"context"
+
 	"github.com/sirupsen/logrus"
 )
 

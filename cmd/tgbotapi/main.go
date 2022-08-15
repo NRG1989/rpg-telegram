@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 
-	"tgbotapi/internal/api/grpc"
-	"tgbotapi/internal/api/tbot"
-	"tgbotapi/internal/config"
-	"tgbotapi/internal/database/postgress"
+	"go-aut-registration-user-telegram/internal/api/grpc"
+	"go-aut-registration-user-telegram/internal/api/tbot"
+	"go-aut-registration-user-telegram/internal/config"
+	"go-aut-registration-user-telegram/internal/database/postgress"
 
 	"github.com/sirupsen/logrus"
 )
